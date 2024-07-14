@@ -28,13 +28,16 @@ def create_content():
     durations = []
     total_duration = 0
     i = 0
-    posts = get_reddit_posts('mildlyinteresting', 50)
+    posts, after = get_reddit_posts('mildlyinteresting')
     while total_duration < 60:
+        if i == len(posts):
+            posts, after = get_reddit_posts('mildlyinteresting', after)
+            i = 0
         post = posts[i]
         # create image from reddit data
-        file_format = post['image'].split('.')[-1]
+        file_format = post['url'].split('.')[-1]
         image_path = f"public/image/{i}.{file_format}"
-        get_image(post['image'], image_path)
+        get_image(post['url'], image_path)
         image_paths.append(image_path)
         print(f"Saved {image_path}")
 
