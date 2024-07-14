@@ -10,12 +10,14 @@ import {
 	Sequence,
 	useVideoConfig,
 	watchStaticFile,
+	Audio,
 } from 'remotion';
 import {z} from 'zod';
 import Subtitle from './Subtitle';
 import {getVideoMetadata} from '@remotion/media-utils';
 import {loadFont} from '../load-font';
 import {NoCaptionFile} from './NoCaptionFile';
+import VideoInfo from '../../public/info.json';
 
 export type SubtitleProp = {
 	startInSeconds: number;
@@ -115,6 +117,9 @@ export const CaptionedVideo: React.FC<{
 				);
 			})}
 			{getFileExists(subtitlesFile) ? null : <NoCaptionFile />}
+			<AbsoluteFill>
+				<Audio loop src={VideoInfo.song_url} volume={0.1} />
+			</AbsoluteFill>
 		</AbsoluteFill>
 	);
 };

@@ -4,21 +4,38 @@ import {
 	calculateCaptionedVideoMetadata,
 	captionedVideoSchema,
 } from './CaptionedVideo';
+import {LayeredVideo, layeredVideoSchema} from './LayeredVideo';
+import VideoInfo from '../public/info.json';
 
 // Each <Composition> is an entry in the sidebar!
 
 export const RemotionRoot: React.FC = () => {
 	return (
-		<Composition
-			id="CaptionedVideo"
-			component={CaptionedVideo}
-			calculateMetadata={calculateCaptionedVideoMetadata}
-			schema={captionedVideoSchema}
-			width={1080}
-			height={1920}
-			defaultProps={{
-				src: staticFile('sample-video.mp4'),
-			}}
-		/>
+		<>
+			<Composition
+				id="CaptionedVideo"
+				component={CaptionedVideo}
+				calculateMetadata={calculateCaptionedVideoMetadata}
+				schema={captionedVideoSchema}
+				width={1080}
+				height={1920}
+				defaultProps={{
+					src: staticFile('temp.mp4'),
+				}}
+			/>
+
+			<Composition
+				id="LayeredVideo"
+				component={LayeredVideo}
+				fps={30}
+				durationInFrames={Math.floor(VideoInfo.duration_in_seconds * 30)}
+				schema={layeredVideoSchema}
+				width={1080}
+				height={1920}
+				defaultProps={{
+					backgroundSource: staticFile('gameplay.mp4'),
+				}}
+			/>
+		</>
 	);
 };

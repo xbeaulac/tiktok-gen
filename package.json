@@ -5,11 +5,12 @@
   "repository": {},
   "license": "UNLICENSED",
   "dependencies": {
-    "@remotion/cli": "4.0.179",
-    "@remotion/zod-types": "4.0.179",
     "@remotion/animation-utils": "4.0.179",
+    "@remotion/cli": "4.0.179",
     "@remotion/layout-utils": "4.0.179",
     "@remotion/media-utils": "4.0.179",
+    "@remotion/renderer": "4.0.179",
+    "@remotion/zod-types": "4.0.179",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "remotion": "4.0.179",
@@ -26,7 +27,7 @@
   },
   "scripts": {
     "start": "remotion studio",
-    "build": "remotion render CaptionedVideo",
+    "build": "remotion render LayeredVideo public/temp.mp4",
     "upgrade": "remotion upgrade",
     "test": "eslint src --ext ts,tsx,js,jsx && tsc",
     "create-subtitles": "node sub.mjs"
