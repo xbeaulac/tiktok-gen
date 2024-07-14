@@ -118,7 +118,7 @@ export const CaptionedVideo: React.FC<{
 			})}
 			{getFileExists(subtitlesFile) ? null : <NoCaptionFile />}
 			<AbsoluteFill>
-				<Audio loop src={VideoInfo.song_url} volume={0.1} />
+				<Audio loop src={VideoInfo.song_url} volume={0} />
 			</AbsoluteFill>
 		</AbsoluteFill>
 	);
