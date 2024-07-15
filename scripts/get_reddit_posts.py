@@ -40,10 +40,13 @@ def get_reddit_posts(subreddit: str, after: str = ""):
     response = fetch_url(url)
     data = response.json()
     for post in data['data']['children']:
+        if post['data'].get('gallery_data', False):
+            continue  # skip image gallery
         thumbnail: str = post['data']['thumbnail']
         if thumbnail != 'self' and thumbnail != 'nsfw':
-            is_video = True if post['data']['secure_media'] else False
+            is_video = post['data']['is_video']
             title: str = post['data']['title'].replace(".", "").replace(",", "").replace('"', '').strip()
+            post_id: str = post['data']['id']
             if is_video:
                 video_url: str = post['data']['secure_media']['reddit_video']['fallback_url'].split('?')[0]
 
@@ -62,19 +65,22 @@ def get_reddit_posts(subreddit: str, after: str = ""):
 
                 duration = int(post['data']['secure_media']['reddit_video']['duration'])
             else:
+                if post['data']['preview'].get('reddit_video_preview', False):
+                    continue  # skip gif
                 height = post['data']['preview']['images'][0]['source']['height']
                 width = post['data']['preview']['images'][0]['source']['width']
                 media_url = post['data']['url_overridden_by_dest']
                 duration = 0
                 fps = 0
             post_json = {
+                'id': post_id,
                 'title': title,
                 'url': media_url,
                 'type': 'video' if is_video else 'image',
                 'duration': duration,
                 'fps': fps,
                 'height': height,
-                'width': width
+                'width': width,
             }
 
             posts.append(post_json)

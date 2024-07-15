@@ -13,7 +13,6 @@ def get_headers(playwright):
     # Intercept and log network request
     def log_request(route, request):
         if request.url.startswith("https://ads.tiktok.com/creative_radar_api/v1/popular_trend/sound/rank_list"):
-            print(f"Request: {request.headers}")
             nonlocal request_sent
             nonlocal headers
             request_sent = True
