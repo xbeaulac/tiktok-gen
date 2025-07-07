@@ -1,6 +1,7 @@
 import requests
 from requests.exceptions import HTTPError, Timeout, RequestException
 import time
+import m3u8
 
 
 def fetch_url(url, retries=3, delay=5):
@@ -8,7 +9,8 @@ def fetch_url(url, retries=3, delay=5):
     attempt = 0
     while attempt < retries:
         try:
-            response = requests.get(url)
+            response = requests.get(url, headers={
+                'User-Agent': '"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"'})
             if response.status_code == 500:
                 print(f"Server error (500). Retrying in {delay} seconds...")
                 attempt += 1
@@ -39,25 +41,47 @@ def get_reddit_posts(subreddit: str, after: str = ""):
     response = fetch_url(url)
     data = response.json()
     for post in data['data']['children']:
+        if post['data'].get('gallery_data', False):
+            continue  # skip image gallery
         thumbnail: str = post['data']['thumbnail']
         if thumbnail != 'self' and thumbnail != 'nsfw':
-            is_video = True if post['data']['secure_media'] else False
+            is_video = post['data']['is_video']
             title: str = post['data']['title'].replace(".", "").replace(",", "").replace('"', '').strip()
+            post_id: str = post['data']['id']
             if is_video:
                 video_url: str = post['data']['secure_media']['reddit_video']['fallback_url'].split('?')[0]
+
+                height = post['data']['secure_media']['reddit_video']['height']
+                width = post['data']['secure_media']['reddit_video']['width']
+
+                m3u8_url = post['data']['secure_media']['reddit_video']['hls_url']
+                m3u8_obj = m3u8.load(m3u8_url)
+                stream_info = str(m3u8_obj.playlists[0].stream_info).split(',')
+                fps = int([info.split('=')[1] for info in stream_info if "FRAME-RATE" in info][0])
+
                 audio_url = video_url.split('/')[:-1]
                 audio_url.append('DASH_AUDIO_128.mp4')
                 audio_url = '/'.join(audio_url)
                 media_url = {'video': video_url, 'audio': audio_url}
+
                 duration = int(post['data']['secure_media']['reddit_video']['duration'])
             else:
+                if post['data']['preview'].get('reddit_video_preview', False):
+                    continue  # skip gif
+                height = post['data']['preview']['images'][0]['source']['height']
+                width = post['data']['preview']['images'][0]['source']['width']
                 media_url = post['data']['url_overridden_by_dest']
                 duration = 0
+                fps = 0
             post_json = {
+                'id': post_id,
                 'title': title,
                 'url': media_url,
                 'type': 'video' if is_video else 'image',
-                'duration': duration
+                'duration': duration,
+                'fps': fps,
+                'height': height,
+                'width': width,
             }
 
             posts.append(post_json)
