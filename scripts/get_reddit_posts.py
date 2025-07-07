@@ -9,7 +9,8 @@ def fetch_url(url, retries=3, delay=5):
     attempt = 0
     while attempt < retries:
         try:
-            response = requests.get(url)
+            response = requests.get(url, headers={
+                'User-Agent': '"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"'})
             if response.status_code == 500:
                 print(f"Server error (500). Retrying in {delay} seconds...")
                 attempt += 1
